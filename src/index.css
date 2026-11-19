@@ -162,6 +162,22 @@ body {
   mask-size: contain;
 }
 
+/* Hero lotus arch: fills the first screen on phones (max 12% vertical stretch), fixed size on larger screens */
+.hero-arch {
+  --arch-w: calc(100vw - 20px);
+  --arch-h: calc(var(--arch-w) * 636 / 359);
+  width: var(--arch-w);
+  height: clamp(var(--arch-h), calc(100dvh - 64px), calc(var(--arch-h) * 1.12));
+}
+
+@media (min-width: 768px) {
+  .hero-arch {
+    width: min(84vw, 420px);
+    height: auto;
+    aspect-ratio: 359 / 636;
+  }
+}
+
 .gold-hairline {
   background: linear-gradient(90deg, transparent, var(--color-gold) 50%, transparent);
 }
