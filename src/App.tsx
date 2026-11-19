@@ -49,6 +49,8 @@ const PRE_IMAGES = [
 ];
 
 const EASE_SILK = [0.16, 1, 0.3, 1] as const;
+const HERO_FRAME = "/images/hero-lotus-frame.jpg";
+
 const LOTUS = {
   arch: "/images/lotus-arch-gold.png",
   stem: "/images/lotus-stem.png",
@@ -421,14 +423,6 @@ export default function WeddingInvitation() {
     }
   }, [isOpened, isPlaying, hasAttemptedAutoplay]);
 
-  useEffect(() => {
-    if (introVideoRef.current && !hasStarted) {
-      introVideoRef.current.play().catch((err) => {
-        console.log("Intro video autoplay failed:", err);
-      });
-    }
-  }, [hasStarted]);
-
   const rsvpChoices = [
     { value: "1", text: "ඔව්, සතුටින් සහභාගී වෙමි!", active: rsvpForm.guests !== "0" },
     { value: "0", text: "කණගාටුයි, සහභාගී විය නොහැක. නමුත් මගේ ආශීර්වාදය ඔබ සමඟයි.", active: rsvpForm.guests === "0" },
@@ -456,10 +450,7 @@ export default function WeddingInvitation() {
               muted={true}
               playsInline
               preload="auto"
-              autoPlay
-              loop={!hasStarted}
-              className={`w-full h-full object-cover transition-all duration-[2000ms] ease-out ${!hasStarted ? "blur-[6px] scale-105 opacity-90" : "blur-0 scale-100 opacity-100"
-                }`}
+              className={`w-full h-full object-cover transition-opacity duration-[1200ms] ease-out ${hasStarted ? "opacity-100" : "opacity-0"}`}
               onEnded={() => setIsOpened(true)}
               onError={(e) => { console.error("Video error:", e); setIsOpened(true); }}
             >
@@ -467,7 +458,7 @@ export default function WeddingInvitation() {
             </video>
 
             {!hasStarted && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center z-[120] bg-[radial-gradient(ellipse_at_center,rgba(255,250,238,0.85)_0%,rgba(250,238,214,0.55)_55%,rgba(46,33,21,0.25)_100%)] px-6">
+              <div className="absolute inset-0 flex flex-col items-center justify-center z-[120] bg-[radial-gradient(ellipse_at_center,rgba(255,250,238,0.72)_0%,rgba(255,250,238,0.35)_45%,transparent_75%)] px-6">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -496,7 +487,6 @@ export default function WeddingInvitation() {
                       setHasStarted(true);
 
                       if (introVideoRef.current) {
-                        introVideoRef.current.loop = false;
                         introVideoRef.current.currentTime = 0;
                         introVideoRef.current.play().catch((err) => console.log(err));
                       }
@@ -610,61 +600,71 @@ export default function WeddingInvitation() {
             </motion.button>
 
             {/* ---------- HERO ---------- */}
-            <section className="relative w-full overflow-hidden bg-paper min-h-[100dvh] md:min-h-0 pt-12 pb-3 md:pt-28 md:pb-10 flex flex-col items-center justify-center md:justify-start">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,251,242,0.95)_0%,transparent_60%)]" aria-hidden="true" />
-
-              {/* Gold lotus arch; the names sit in the clear space inside it */}
+            <section className="relative w-full overflow-hidden bg-paper flex justify-center">
+              {/* Golden lotus frame artwork fills the hero; the names sit inside its arch */}
               <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.6, ease: EASE_SILK }}
-                className="@container relative hero-arch"
+                initial={{ opacity: 0, scale: 1.03 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.8, ease: EASE_SILK }}
+                className="@container relative hero-bg"
               >
-                <LotusImage src={LOTUS.arch} className="absolute inset-0 w-full h-full object-fill md:object-contain" />
+                <img
+                  src={HERO_FRAME}
+                  alt=""
+                  aria-hidden="true"
+                  draggable={false}
+                  className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                />
 
-                {/* Gold lotus trio crowning the top of the arch */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: 0.3, duration: 1.4, ease: EASE_SILK }}
-                  className="absolute left-1/2 top-0 w-[58%] -translate-x-1/2 -translate-y-[62%] z-10"
-                >
-                  <LotusImage src={LOTUS.trio} className="w-full drop-shadow-[0_6px_14px_rgba(138,100,36,0.25)]" />
-                </motion.div>
-
-                <div className="absolute left-[39%] right-[11%] top-[13%] h-[60%] flex flex-col items-center justify-center text-center">
+                <div className="absolute left-[30%] right-[16%] top-[14%] h-[52%] flex flex-col items-center justify-center text-center">
                   {guestName && (
                     <motion.p
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5, duration: 1, ease: EASE_SILK }}
-                      className="text-[max(15px,5cqw)] text-gold-deep leading-snug mb-[4cqw] px-[2cqw] pb-[1.5cqw] border-b border-gold/40"
+                      className="font-display italic text-[max(16px,5.2cqw)] text-gold-deep leading-snug mb-[3.5cqw] px-[3cqw] pb-[1.2cqw] border-b border-gold/50"
                     >
                       {guestName}
                     </motion.p>
                   )}
 
+                  {/* Warm welcome, framed by small gold diamonds */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.55, duration: 1.2, ease: EASE_SILK }}
+                    className="flex items-center gap-[2.2cqw] text-gold"
+                  >
+                    <span className="w-[1.4cqw] h-[1.4cqw] rotate-45 bg-current" aria-hidden="true" />
+                    <span className="text-[max(16px,5.4cqw)] leading-snug text-gold-deep">සාදර ඇරයුමයි</span>
+                    <span className="w-[1.4cqw] h-[1.4cqw] rotate-45 bg-current" aria-hidden="true" />
+                  </motion.div>
+
                   <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 1.4, ease: EASE_SILK }}
-                    className="flex flex-col items-center"
+                    transition={{ delay: 0.7, duration: 1.4, ease: EASE_SILK }}
+                    className="mt-[4cqw] flex flex-col items-center"
                   >
-                    <h1 className={`text-[11.5cqw] text-foil leading-[1.15] ${softGlow}`}>{INVITATION.couple.bride}</h1>
+                    <h1 className={`text-[13.5cqw] text-foil leading-[1.12] ${softGlow}`}>{INVITATION.couple.bride}</h1>
 
-                    <span className="my-[1.5cqw] text-[6.5cqw] leading-none text-gold-deep">සහ</span>
+                    <span className="my-[1.2cqw] text-[6cqw] leading-none text-gold-deep/90">සහ</span>
 
-                    <h1 className={`text-[11.5cqw] text-foil leading-[1.15] ${softGlow}`}>{INVITATION.couple.groom}</h1>
+                    <h1 className={`text-[13.5cqw] text-foil leading-[1.12] ${softGlow}`}>{INVITATION.couple.groom}</h1>
                   </motion.div>
 
-                  <motion.p
+                  {/* Date between fine gold rules, finished with a small nelum */}
+                  <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 1, duration: 1.2 }}
-                    className="mt-[5cqw] font-numeric text-[max(15px,4.7cqw)] tracking-[0.15em] text-gold-deep whitespace-nowrap"
+                    transition={{ delay: 1.1, duration: 1.2 }}
+                    className="mt-[5cqw] flex flex-col items-center"
                   >
-                    {INVITATION.date.displayNumeric}
-                  </motion.p>
+                    <p className="font-numeric text-[max(15px,4.8cqw)] tracking-[0.18em] text-gold-deep whitespace-nowrap border-y border-gold/45 px-[3cqw] py-[1.6cqw]">
+                      {INVITATION.date.displayNumeric}
+                    </p>
+                    <LotusMark className="mt-[3.5cqw] w-[9cqw] h-[6cqw] text-gold" />
+                  </motion.div>
                 </div>
               </motion.div>
             </section>

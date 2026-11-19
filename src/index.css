@@ -162,19 +162,22 @@ body {
   mask-size: contain;
 }
 
-/* Hero lotus arch: fills the first screen on phones (max 12% vertical stretch), fixed size on larger screens */
-.hero-arch {
-  --arch-w: calc(100vw - 20px);
-  --arch-h: calc(var(--arch-w) * 636 / 359);
-  width: var(--arch-w);
-  height: clamp(var(--arch-h), calc(100dvh - 64px), calc(var(--arch-h) * 1.12));
+/* Hero lotus frame: fills the first screen on phones (cover crop, max 12% taller than the art),
+   centred portrait panel with softly faded sides on larger screens */
+.hero-bg {
+  --hero-w: 100vw;
+  --hero-h: calc(var(--hero-w) * 1671 / 941);
+  width: var(--hero-w);
+  height: clamp(var(--hero-h), 100dvh, calc(var(--hero-h) * 1.12));
 }
 
 @media (min-width: 768px) {
-  .hero-arch {
-    width: min(84vw, 420px);
+  .hero-bg {
+    width: min(100vw, calc(100dvh * 941 / 1671), 640px);
     height: auto;
-    aspect-ratio: 359 / 636;
+    aspect-ratio: 941 / 1671;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
   }
 }
 
