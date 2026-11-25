@@ -1,38 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Calendar, Clock } from "lucide-react";
+import { MapPin, Calendar, Church } from "lucide-react";
+import { AUDIENCES, readAudience } from "./audience";
 
 const INVITATION = {
   couple: {
-    bride: "නෙත්මි",
-    groom: "දිලූක",
-    brideFull: "නෙත්මි ශෙහානි පෙරේරා",
-    groomFull: "දිලූක මධුශාන් ජයසිංහ",
+    bride: "හර්ෂනී",
+    groom: "පසිඳු",
+    brideFull: "හර්ෂනී පීරිස්",
+    groomFull: "පසිඳු විතාන",
+  },
+  parents: {
+    bride: "සැම්සන් පීරිස් මහතාගේ සහ ජැනට් ප්‍රනාන්දු මහත්මියගේ ආදරණීය දියණිය වන",
+    groom: "අනුර විතාන මහතාගේ සහ කේ. චාන්දනී මහත්මියගේ ආදරණීය පුත් වන",
   },
   date: {
-    displayNumeric: "19 . 02 . 2027",
-    displayLong: "වර්ෂ 2027 ක් වූ පෙබරවාරි මස 19 වන දින",
-    countdownTarget: "2027-02-19T10:30:00+05:30",
+    displayNumeric: "14 . 01 . 2027",
+    displayLong: "වර්ෂ 2027 ක් වූ ජනවාරි මස 14 වන බ්‍රහස්පතින්දා",
+    countdownTarget: "2027-01-14T08:00:00+05:30",
   },
   time: {
-    ceremonyStart: "ප.ව. 10:30",
-    ceremonyEnd: "ප.ව. 3:30",
-    registration: "පෙ.ව. 10:45",
-    welcome: "පෙ.ව. 9:30",
+    mass: "පෙ.ව. 8.00",
+    poruwa: "පෙ.ව. 10.41",
+    receptionStart: "පෙ.ව. 10.30",
+    receptionEnd: "ප.ව. 3.30",
+  },
+  church: {
+    name: "St. Mary's Church",
+    city: "Negombo",
+    address: "Grand Street, Negombo",
+    mapQuery: "St. Mary's Church, Negombo",
+    googleMapsLink: "https://www.google.com/maps/search/?api=1&query=St.%20Mary's%20Church%2C%20Negombo",
   },
   venue: {
-    name: "Cinnamon Life at City of Dreams",
-    city: "Colombo",
-    address: "අංක 01, ජස්ටිස් අක්බාර් මාවත, කොළඹ 02.",
-    image: "/images/venue-cinnamon-life.jpg",
-    mapQuery: "Cinnamon Life at City of Dreams, Colombo",
-    googleMapsLink: "https://www.google.com/maps/search/?api=1&query=Cinnamon%20Life%20at%20City%20of%20Dreams%2C%20Colombo",
+    name: "Auric Grand Ballroom",
+    city: "Negombo",
+    address: "Golden Star Beach Hotel, Negombo",
+    mapQuery: "Golden Star Beach Hotel, Negombo",
+    googleMapsLink: "https://maps.app.goo.gl/FikwniSaSDe9k6DK7",
   },
-  rsvpContacts: [
-    "Kasun Perera - +94 77 234 5678",
-    "Sachini Jayasinghe - +94 71 345 6789",
-  ],
 } as const;
+
+export { INVITATION };
+
+/* Guest name from a personalised link: /{name} (or legacy ?to={name}) */
+function readGuestName(): string | null {
+  const fromQuery = new URLSearchParams(window.location.search).get("to");
+  if (fromQuery?.trim()) return fromQuery.trim();
+
+  const segment = window.location.pathname.replace(/^\/+|\/+$/g, "");
+  if (!segment || segment.includes("/") || segment === "admin" || segment === "index.html") return null;
+
+  try {
+    return decodeURIComponent(segment).trim() || null;
+  } catch {
+    return null;
+  }
+}
 
 const backgroundMusic = "/handawaka-various-artists.mp3";
 const googleScriptUrl =
@@ -333,8 +357,8 @@ export default function WeddingInvitation() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasAttemptedAutoplay, setHasAttemptedAutoplay] = useState(false);
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const guestName = searchParams.get("to");
+  const guestName = readGuestName();
+  const audience = readAudience();
 
   const [rsvpForm, setRsvpForm] = useState({
     name: "",
@@ -617,17 +641,6 @@ export default function WeddingInvitation() {
                 />
 
                 <div className="absolute left-[30%] right-[16%] top-[14%] h-[52%] flex flex-col items-center justify-center text-center">
-                  {guestName && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5, duration: 1, ease: EASE_SILK }}
-                      className="font-display italic text-[max(16px,5.2cqw)] text-gold-deep leading-snug mb-[3.5cqw] px-[3cqw] pb-[1.2cqw] border-b border-gold/50"
-                    >
-                      {guestName}
-                    </motion.p>
-                  )}
-
                   {/* Warm welcome, framed by small gold diamonds */}
                   <motion.div
                     initial={{ opacity: 0, y: -6 }}
@@ -679,6 +692,13 @@ export default function WeddingInvitation() {
                 className="relative px-6 flex flex-col items-center text-center"
               >
                 <OrnamentDivider className="mb-5" />
+                {guestName && (
+                  <p className="text-ink/80 text-xl md:text-lg leading-loose max-w-md mb-4">
+                    <span className="font-display italic text-2xl md:text-3xl text-gold-deep">{guestName},</span>
+                    <br />
+                    අපගේ මේ විශේෂ දිනය අප සමඟ සැමරීමට {AUDIENCES[audience].phrase} ආදරයෙන් ආරාධනා කරමු.
+                  </p>
+                )}
                 <p className="text-ink/75 text-xl md:text-lg leading-loose max-w-md">
                   අපගේ ජීවිතයේ අතිශය සුන්දර හා අමතක නොවන මොහොත ඔබ සමඟ බෙදා ගැනීමට අප සතුටින් බලාපොරොත්තු වෙමු!
                 </p>
@@ -704,8 +724,8 @@ export default function WeddingInvitation() {
                   <OrnamentDivider className="mb-10" />
 
                   <div className="space-y-5 md:space-y-6 max-w-3xl mx-auto leading-relaxed text-xl md:text-lg">
-                    <p className="text-ink/75">පෙරේරා මහතාගේ සහ එම මහත්මියගේ ආදරණීය දියණිය වන</p>
-                    <h3 className="text-3xl md:text-5xl text-foil leading-snug">නෙත්මි ශෙහානි පෙරේරා</h3>
+                    <p className="text-ink/75">{INVITATION.parents.bride}</p>
+                    <h3 className="text-3xl md:text-5xl text-foil leading-snug">{INVITATION.couple.brideFull}</h3>
 
                     <div className="flex items-center justify-center gap-3 py-1 text-gold/70" aria-hidden="true">
                       <span className="h-px w-10 bg-current" />
@@ -713,8 +733,8 @@ export default function WeddingInvitation() {
                       <span className="h-px w-10 bg-current" />
                     </div>
 
-                    <p className="text-ink/75">ජයසිංහ මහතාගේ සහ එම මහත්මියගේ ආදරණීය පුත් වන</p>
-                    <h3 className="text-3xl md:text-5xl text-foil leading-snug">දිලූක මධුශාන් ජයසිංහ</h3>
+                    <p className="text-ink/75">{INVITATION.parents.groom}</p>
+                    <h3 className="text-3xl md:text-5xl text-foil leading-snug">{INVITATION.couple.groomFull}</h3>
 
                     <p className="text-ink/75 max-w-2xl mx-auto pt-4 leading-loose">
                       එකිනෙකාගේ ජීවිතයට සදාකාලිකව අතිනත ගන්නා මේ සුන්දර මොහොත, ඔබගේ ආශීර්වාදයෙන් හා සෙනෙහසින් වර්ණවත් කර ගැනීමට අප ආදරයෙන් ඇරයුම් කරන්නෙමු.
@@ -745,24 +765,28 @@ export default function WeddingInvitation() {
                   <FramedCorners inset="inset-4 md:inset-6" size="w-10 h-10 md:w-14 md:h-14" />
 
                   <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-0">
-                    {[
+                    {([
                       {
                         icon: Calendar,
                         label: "දිනය",
                         value: INVITATION.date.displayLong,
+                        sub: `${INVITATION.time.receptionStart} සිට ${INVITATION.time.receptionEnd} දක්වා`,
                       },
                       {
-                        icon: Clock,
-                        label: "වේලාව",
-                        value: `පෝරුව චාරිත්‍ර ${INVITATION.time.ceremonyStart}ට`,
+                        icon: Church,
+                        label: "මංගල දිව්‍ය පූජාව",
+                        value: `${INVITATION.time.mass}ට`,
+                        sub: `${INVITATION.church.name}, ${INVITATION.church.city}`,
+                        link: INVITATION.church.googleMapsLink,
                       },
                       {
                         icon: MapPin,
-                        label: "ස්ථානය",
-                        value: `${INVITATION.venue.name}, ${INVITATION.venue.city}`,
+                        label: "පෝරුව චාරිත්‍රය",
+                        value: `${INVITATION.time.poruwa}ට`,
+                        sub: `${INVITATION.venue.name}, ${INVITATION.venue.address}`,
                         link: INVITATION.venue.googleMapsLink,
                       },
-                    ].map((item, i) => {
+                    ] as Array<{ icon: typeof Calendar; label: string; value: string; sub?: string; link?: string }>).map((item, i) => {
                       const Icon = item.icon;
                       return (
                         <motion.div
@@ -780,6 +804,9 @@ export default function WeddingInvitation() {
                           <span className="mt-5 text-lg md:text-base text-gold-deep/70">{item.label}</span>
                           <span className="mt-2 h-px w-8 bg-gold/40" />
                           <span className="mt-3 text-lg md:text-xl text-ink leading-relaxed">{item.value}</span>
+                          {item.sub && (
+                            <span className="mt-1.5 font-display text-lg text-ink/70 leading-snug">{item.sub}</span>
+                          )}
                           {item.link && (
                             <a
                               href={item.link}
@@ -801,7 +828,7 @@ export default function WeddingInvitation() {
 
             {/* ---------- VENUE + MAP ---------- */}
             <section className="relative w-full py-16 md:py-28 flex flex-col items-center overflow-hidden">
-              <div className="w-full max-w-[880px] px-5 md:px-6 flex flex-col items-center text-center">
+              <div className="w-full max-w-[1040px] px-5 md:px-6 flex flex-col items-center text-center">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -809,62 +836,83 @@ export default function WeddingInvitation() {
                   transition={{ duration: 1.1, ease: EASE_SILK }}
                   className="flex flex-col items-center mb-10 md:mb-12"
                 >
-                  <SectionLabel>Venue</SectionLabel>
-                  <h2 className="mt-4 text-3xl md:text-5xl text-foil leading-tight">උත්සව ස්ථානය</h2>
+                  <SectionLabel>Venues</SectionLabel>
+                  <h2 className="mt-4 text-3xl md:text-5xl text-foil leading-tight">උත්සව ස්ථාන</h2>
                   <OrnamentDivider className="mt-6" />
                 </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1.2, ease: EASE_SILK }}
-                  className="relative w-full paper-card rounded-[2rem] border border-gold/40 shadow-[0_40px_80px_-40px_rgba(138,100,36,0.45)] p-3 md:p-4"
-                >
-                  <div className="absolute inset-1.5 md:inset-2 rounded-[1.75rem] border border-gold/20 pointer-events-none" />
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6">
+                  {[
+                    {
+                      key: "church",
+                      icon: Church,
+                      event: "මංගල දිව්‍ය පූජාව",
+                      time: `${INVITATION.time.mass}ට`,
+                      name: INVITATION.church.name,
+                      address: INVITATION.church.address,
+                      mapQuery: INVITATION.church.mapQuery,
+                      link: INVITATION.church.googleMapsLink,
+                    },
+                    {
+                      key: "venue",
+                      icon: MapPin,
+                      event: "පෝරුව චාරිත්‍රය සහ සාදය",
+                      time: `පෝරුව ${INVITATION.time.poruwa}ට · ${INVITATION.time.receptionStart} – ${INVITATION.time.receptionEnd}`,
+                      name: INVITATION.venue.name,
+                      address: INVITATION.venue.address,
+                      mapQuery: INVITATION.venue.mapQuery,
+                      link: INVITATION.venue.googleMapsLink,
+                    },
+                  ].map((place, i) => {
+                    const Icon = place.icon;
+                    return (
+                      <motion.div
+                        key={place.key}
+                        initial={{ opacity: 0, y: 28 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.15, duration: 1.2, ease: EASE_SILK }}
+                        className="relative w-full paper-card rounded-[2rem] border border-gold/40 shadow-[0_40px_80px_-40px_rgba(138,100,36,0.45)] p-3 md:p-4 flex flex-col"
+                      >
+                        <div className="absolute inset-1.5 md:inset-2 rounded-[1.75rem] border border-gold/20 pointer-events-none" />
 
-                  {/* Venue illustration */}
-                  <div className="relative overflow-hidden rounded-[1.5rem] border border-gold/30 mb-3 md:mb-4 aspect-[4/3] md:aspect-[16/8] bg-ivory">
-                    <img
-                      src={INVITATION.venue.image}
-                      alt={INVITATION.venue.name}
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover object-[62%_58%] md:object-[62%_38%] transition-transform duration-[3s] hover:scale-105"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ivory/80 to-transparent pointer-events-none" />
-                  </div>
+                        {/* Embedded Google Map */}
+                        <div className="relative overflow-hidden rounded-[1.5rem] border border-gold/30 aspect-[4/3] bg-gold-pale/40">
+                          <iframe
+                            title={`${place.name} map`}
+                            src={`https://maps.google.com/maps?q=${encodeURIComponent(place.mapQuery)}&z=15&output=embed`}
+                            className="absolute inset-0 w-full h-full border-0 [filter:sepia(0.25)_saturate(0.9)]"
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            allowFullScreen
+                          />
+                        </div>
 
-                  {/* Embedded Google Map */}
-                  <div className="relative overflow-hidden rounded-[1.5rem] border border-gold/30 aspect-[4/3] md:aspect-[16/8] bg-gold-pale/40">
-                    <iframe
-                      title={`${INVITATION.venue.name} map`}
-                      src={`https://maps.google.com/maps?q=${encodeURIComponent(INVITATION.venue.mapQuery)}&z=15&output=embed`}
-                      className="absolute inset-0 w-full h-full border-0 [filter:sepia(0.25)_saturate(0.9)]"
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      allowFullScreen
-                    />
-                  </div>
+                        <div className="relative px-4 pt-8 pb-6 md:pt-10 md:pb-8 flex flex-col items-center flex-1">
+                          <span className="relative -mt-14 md:-mt-16 mb-4 w-14 h-14 rounded-full border border-gold/50 bg-ivory flex items-center justify-center shadow-[0_8px_20px_-10px_rgba(138,100,36,0.6)]">
+                            <Icon className="w-5 h-5 text-gold-deep" strokeWidth={1.4} />
+                          </span>
+                          <p className="text-lg text-gold-deep/80">{place.event}</p>
+                          <span className="mt-2 h-px w-8 bg-gold/40" />
+                          <h3 className="mt-3 font-display text-2xl md:text-3xl text-ink leading-snug">{place.name}</h3>
+                          <p className="mt-1 font-display text-lg text-ink/70">{place.address}</p>
+                          <p className="mt-2 text-lg text-gold-deep">{place.time}</p>
 
-                  <div className="relative px-4 pt-8 pb-6 md:pt-10 md:pb-8 flex flex-col items-center">
-                    <span className="relative -mt-14 md:-mt-16 mb-4 w-14 h-14 rounded-full border border-gold/50 bg-ivory flex items-center justify-center shadow-[0_8px_20px_-10px_rgba(138,100,36,0.6)]">
-                      <MapPin className="w-5 h-5 text-gold-deep" strokeWidth={1.4} />
-                    </span>
-                    <h3 className="text-2xl md:text-3xl text-ink leading-snug">{INVITATION.venue.name}</h3>
-                    <p className="mt-2 text-lg text-ink/70">{INVITATION.venue.address}</p>
-
-                    <a
-                      href={INVITATION.venue.googleMapsLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative mt-7 inline-flex items-center gap-2 overflow-hidden btn-gold text-ivory px-8 py-3.5 rounded-full text-lg"
-                    >
-                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                      <MapPin className="relative w-4 h-4" strokeWidth={1.6} />
-                      <span className="relative">සිතියමෙන් බලන්න</span>
-                    </a>
-                  </div>
-                </motion.div>
+                          <a
+                            href={place.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group relative mt-7 inline-flex items-center gap-2 overflow-hidden btn-gold text-ivory px-8 py-3.5 rounded-full text-lg"
+                          >
+                            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                            <MapPin className="relative w-4 h-4" strokeWidth={1.6} />
+                            <span className="relative">සිතියමෙන් බලන්න</span>
+                          </a>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
               </div>
             </section>
 
@@ -1042,22 +1090,6 @@ export default function WeddingInvitation() {
                   <p className="text-ink/70 text-xl md:text-lg leading-loose max-w-2xl mx-auto">
                     අපගේ ජීවිතයේ නව පරිච්ඡේදය ආරම්භ වන මේ සුන්දර දිනය, ඔබගේ පැමිණීමෙන් තවත් විශේෂ මතකයක් බවට පත්වේවි යැයි අප විශ්වාස කරමු.
                   </p>
-
-                  <div className="mt-12 flex flex-col items-center gap-5 w-full max-w-xl mx-auto">
-                    <p className="text-gold-deep/80 text-lg md:text-base">සම්බන්ධතා</p>
-
-                    <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-5">
-                      {INVITATION.rsvpContacts.map((line) => (
-                        <a
-                          key={line}
-                          href={`tel:${line.split("-").slice(1).join("-").replace(/\s/g, "")}`}
-                          className="font-display text-lg text-ink/80 px-6 py-2.5 rounded-full border border-gold/35 bg-ivory/50 hover:bg-ivory hover:border-gold transition-colors"
-                        >
-                          {line}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
 
                   <div className="mt-16 h-px w-40 gold-hairline" />
                   <p className="mt-6 text-lg text-gold-deep/70">
