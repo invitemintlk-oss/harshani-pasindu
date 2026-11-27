@@ -61,7 +61,7 @@ function readGuestName(): string | null {
 const backgroundMusic = "/handawaka-various-artists.mp3";
 /* Web app URL from google-apps-script/Code.gs (Deploy → Web app → .../exec) */
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycby_c10vwLXgb_9U1-35RaHWsAauhFYGEiXSCuTnEpEmzLJCc1elXpqXIjFLnV191yBl/exec";
+  "https://script.google.com/macros/s/AKfycbyVQxWmxO_O9PUdV15330XzfrXQxo-LE1Dk2v6jmRGRB9VDpcxlH0tIV20A2PrdFbzL/exec";
 
 const preImagePath = (fileName: string) => `/pre/${fileName.replaceAll(" ", "%20")}`;
 
