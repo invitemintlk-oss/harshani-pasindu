@@ -361,7 +361,7 @@ export default function WeddingInvitation() {
   const audience = readAudience();
 
   const [rsvpForm, setRsvpForm] = useState({
-    name: "",
+    name: guestName ?? "",
     guests: "1",
   });
 
@@ -404,7 +404,7 @@ export default function WeddingInvitation() {
       });
 
       setRsvpStatus("success");
-      setRsvpForm({ name: "", guests: "1" });
+      setRsvpForm({ name: guestName ?? "", guests: "1" });
     } catch {
       setRsvpStatus("error");
     }
