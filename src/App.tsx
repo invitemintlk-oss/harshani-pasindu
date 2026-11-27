@@ -59,8 +59,9 @@ function readGuestName(): string | null {
 }
 
 const backgroundMusic = "/handawaka-various-artists.mp3";
-const googleScriptUrl =
-  "https://script.google.com/macros/s/AKfycbx6tVTRxM0Fjc10fR0a35PjSjb9JJN-9F7zDpxyJvVMhdZ3A-_rOkAV8x8Cwpeqfp5NLw/exec";
+/* Web app URL from google-apps-script/Code.gs (Deploy → Web app → .../exec) */
+const GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycby_c10vwLXgb_9U1-35RaHWsAauhFYGEiXSCuTnEpEmzLJCc1elXpqXIjFLnV191yBl/exec";
 
 const preImagePath = (fileName: string) => `/pre/${fileName.replaceAll(" ", "%20")}`;
 
@@ -371,18 +372,17 @@ export default function WeddingInvitation() {
   const introVideoRef = React.useRef<HTMLVideoElement>(null);
 
   const submitToGoogleSheet = async (payload: Record<string, string>) => {
-    if (!googleScriptUrl) {
-      throw new Error("Google Script URL tl ilid ke;");
+    if (!GOOGLE_SCRIPT_URL.startsWith("https://script.google.com/")) {
+      throw new Error("Google Script URL is not set");
     }
 
-    const response = await fetch(googleScriptUrl, {
+    // Apps Script redirects its response to another domain, so the browser
+    // can't read it cross-origin; "no-cors" still delivers the POST reliably.
+    await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
+      mode: "no-cors",
       body: new URLSearchParams(payload),
     });
-
-    if (!response.ok) {
-      throw new Error("b,a,Su id¾:l fkdùh");
-    }
   };
 
   const handleRsvpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -400,7 +400,8 @@ export default function WeddingInvitation() {
         action: "rsvp",
         name: rsvpForm.name.trim(),
         guests: rsvpForm.guests,
-        dietaryNotes: "",
+        invitedAs: guestName ? AUDIENCES[audience].phrase : "",
+        link: guestName ? window.location.href : "",
       });
 
       setRsvpStatus("success");
