@@ -21,7 +21,6 @@ const INVITATION = {
   },
   time: {
     mass: "පෙ.ව. 8.00",
-    poruwa: "පෙ.ව. 10.41",
     receptionStart: "පෙ.ව. 10.30",
     receptionEnd: "ප.ව. 3.30",
   },
@@ -783,8 +782,8 @@ export default function WeddingInvitation() {
                       {
                         icon: MapPin,
                         label: "පෝරුව චාරිත්‍රය",
-                        value: `${INVITATION.time.poruwa}ට`,
-                        sub: `${INVITATION.venue.name}, ${INVITATION.venue.address}`,
+                        value: INVITATION.venue.name,
+                        sub: INVITATION.venue.address,
                         link: INVITATION.venue.googleMapsLink,
                       },
                     ] as Array<{ icon: typeof Calendar; label: string; value: string; sub?: string; link?: string }>).map((item, i) => {
@@ -858,7 +857,7 @@ export default function WeddingInvitation() {
                       key: "venue",
                       icon: MapPin,
                       event: "පෝරුව චාරිත්‍රය සහ සාදය",
-                      time: `පෝරුව ${INVITATION.time.poruwa}ට · ${INVITATION.time.receptionStart} – ${INVITATION.time.receptionEnd}`,
+                      time: `${INVITATION.time.receptionStart} – ${INVITATION.time.receptionEnd}`,
                       name: INVITATION.venue.name,
                       address: INVITATION.venue.address,
                       mapQuery: INVITATION.venue.mapQuery,
